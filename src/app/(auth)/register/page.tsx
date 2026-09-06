@@ -3,7 +3,7 @@ import { RegisterForm } from "@/components/auth/register-form";
 
 export const metadata: Metadata = {
   title: "Create Account",
-  description: "Create your AHF Auto Parts account to track orders, save wishlists, and more.",
+  description: "Create your Germania Auto Parts account to track orders, save wishlists, and more.",
 };
 
 export default function RegisterPage() {

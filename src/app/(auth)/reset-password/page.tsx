@@ -4,7 +4,7 @@ import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
 export const metadata: Metadata = {
   title: "Reset Password",
-  description: "Set a new password for your AHF Auto Parts account.",
+  description: "Set a new password for your Germania Auto Parts account.",
 };
 
 export default function ResetPasswordPage() {

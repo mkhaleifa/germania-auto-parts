@@ -3,7 +3,7 @@ import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = {
   title: "Sign In",
-  description: "Sign in to your AHF Auto Parts account.",
+  description: "Sign in to your Germania Auto Parts account.",
 };
 
 export default function LoginPage() {

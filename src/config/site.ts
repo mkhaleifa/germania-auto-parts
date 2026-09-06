@@ -1,5 +1,5 @@
 export const siteConfig = {
-    name: "AHF Auto Parts",
+    name: "Germania Auto Parts",
     description: "Premium German auto parts shipped worldwide. Genuine OEM and high-quality aftermarket components for Mercedes-Benz, BMW, Audi, Volkswagen, Porsche, and other leading German brands.",
     url : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     ogImage: "",
@@ -17,7 +17,7 @@ export const siteConfig = {
         accountNumber: process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER || "123456789",
         iban: process.env.NEXT_PUBLIC_BANK_IBAN || "DE89370400440532013000",
         swift: process.env.NEXT_PUBLIC_BANK_SWIFT || "DEUTDEFF",
-        holder: process.env.NEXT_PUBLIC_BANK_ACCOUNT_HOLDER || "AHF Auto Parts"
+        holder: process.env.NEXT_PUBLIC_BANK_ACCOUNT_HOLDER || "Germania Auto Parts"
     }
 
 }as const

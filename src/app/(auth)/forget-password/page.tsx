@@ -3,7 +3,7 @@ import { ForgotPasswordForm } from "@/components/auth/forget-password-form";
 
 export const metadata: Metadata = {
   title: "Forgot Password",
-  description: "Reset your AHF Auto Parts account password.",
+  description: "Reset your Germaina Auto Parts account password.",
 };
 
 export default function ForgotPasswordPage() {

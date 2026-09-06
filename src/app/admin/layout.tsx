@@ -5,7 +5,7 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | AHF Admin",
+    template: "%s | Germania Admin",
     default: "Germania Admin Dashboard",
   },
   robots: { index: false, follow: false },
