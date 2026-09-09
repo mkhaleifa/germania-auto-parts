@@ -4,6 +4,7 @@ import type { UserRole } from "@/generated/prisma/client";
 // Edge-compatible auth config — no Prisma, no Node.js-only modules
 // Used by middleware. Full config (with Prisma adapter) is in auth.ts
 export const authConfig: NextAuthConfig = {
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
