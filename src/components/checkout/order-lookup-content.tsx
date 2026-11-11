@@ -98,7 +98,7 @@ export function OrderLookupContent() {
                 id="lookup-order"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
-                placeholder="AHF-20260413-001"
+                placeholder="Germania-20260413-001"
                 className="font-mono"
                 required
               />
@@ -124,17 +124,22 @@ export function OrderLookupContent() {
         <Card className="mt-6">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <h2 className="font-mono text-lg font-bold">{result.orderNumber}</h2>
-              <Badge variant={STATUS_LABELS[result.status]?.variant || "secondary"}>
+              <h2 className="font-mono text-lg font-bold">
+                {result.orderNumber}
+              </h2>
+              <Badge
+                variant={STATUS_LABELS[result.status]?.variant || 'secondary'}
+              >
                 {STATUS_LABELS[result.status]?.label || result.status}
               </Badge>
             </div>
 
             <p className="mt-1 text-sm text-muted-foreground">
-              Placed on {new Date(result.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
+              Placed on{' '}
+              {new Date(result.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
               })}
             </p>
 
@@ -144,7 +149,8 @@ export function OrderLookupContent() {
                 <Truck className="h-4 w-4 text-primary" />
                 <div>
                   <p className="font-medium">
-                    {result.trackingCarrier || "Shipping"}: {result.trackingNumber}
+                    {result.trackingCarrier || 'Shipping'}:{' '}
+                    {result.trackingNumber}
                   </p>
                 </div>
               </div>
@@ -155,7 +161,10 @@ export function OrderLookupContent() {
             {/* Items */}
             <div className="space-y-2">
               {result.items.map((item, i) => (
-                <div key={i} className="flex items-center justify-between text-sm">
+                <div
+                  key={i}
+                  className="flex items-center justify-between text-sm"
+                >
                   <span className="flex items-center gap-2">
                     <Package className="h-3.5 w-3.5 text-muted-foreground" />
                     {item.title} x{item.quantity}
@@ -177,5 +186,5 @@ export function OrderLookupContent() {
         </Card>
       )}
     </div>
-  );
+  )
 }

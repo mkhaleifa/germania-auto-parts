@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     try {
       await sendEmail({
         to: data.email,
-        subject: "Quote Request Received — AHF Auto Parts",
+        subject: "Quote Request Received — Germania Auto Parts",
         html: `
           <h2>Quote Request Received</h2>
           <p>Hi ${data.name},</p>
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
             <li><strong>Quantity:</strong> ${data.quantity}</li>
           </ul>
           <p>We'll respond within 24 hours with pricing and availability.</p>
-          <p>Best regards,<br/>AHF Auto Parts Team</p>
+          <p>Best regards,<br/>Germania Auto Parts Team</p>
         `,
       });
     } catch {

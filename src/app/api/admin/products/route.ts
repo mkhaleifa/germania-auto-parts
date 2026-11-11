@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
   // Auto-generate SKU if not provided
   if (!productData.sku) {
     const count = await db.product.count();
-    productData.sku = `AHF-${String(count + 1).padStart(5, "0")}`;
+    productData.sku = `GERMANIA-${String(count + 1).padStart(5, "0")}`;
   }
 
   const product = await db.$transaction(async (tx) => {

@@ -26,7 +26,7 @@ const supportLinks = [
 const legalLinks = [
   { href: "/privacy", label: "Privacy Policy" },
   { href: "/terms", label: "Terms of Service" },
-  { href: "/tokushoho", label: "Specified Commercial Law" },
+  { href: "/Impressum", label: "Specified Commercial Law" },
 ];
 
 export function Footer() {

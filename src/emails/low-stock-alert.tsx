@@ -14,7 +14,7 @@ interface LowStockAlertEmailProps {
 }
 
 export function LowStockAlertEmail({ products }: LowStockAlertEmailProps) {
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ahfautoparts.com";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://germaniaautoparts.com";
 
   return (
     <EmailLayout preview={`Low stock alert: ${products.length} product(s) need restocking`}>

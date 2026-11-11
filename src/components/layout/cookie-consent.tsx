@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-const CONSENT_KEY = "ahf_cookie_consent";
+const CONSENT_KEY = "germania_cookie_consent";
 const CONSENT_EXPIRY_DAYS = 365;
 
 function getStoredConsent(): "accepted" | "declined" | null {

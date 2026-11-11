@@ -48,7 +48,7 @@ export async function sendEmail({ to, subject, html, replyTo }: SendEmailOptions
 export async function sendAdminNotification(subject: string, html: string) {
   return sendEmail({
     to: ADMIN_EMAIL,
-    subject: `[AHF Admin] ${subject}`,
+    subject: `[Germania Admin] ${subject}`,
     html,
   });
 }

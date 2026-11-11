@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     // Upload to Cloudinary
     const result = await uploadImage(
       buffer,
-      "ahf-auto-parts/products"
+      "germania-auto-parts/products"
     );
 
     // Generate variants

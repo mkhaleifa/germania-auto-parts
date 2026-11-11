@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       try {
         await sendEmail({
           to: email,
-          subject: "Reset Your Password — AHF Auto Parts",
+          subject: "Reset Your Password — Germania Auto Parts",
           html: `
             <h2>Password Reset Request</h2>
             <p>Hi ${user.name || "there"},</p>
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
             <p><a href="${resetUrl}" style="display:inline-block;padding:12px 24px;background:#DC2626;color:white;text-decoration:none;border-radius:6px;">Reset Password</a></p>
             <p>This link expires in 1 hour.</p>
             <p>If you didn't request this, you can safely ignore this email.</p>
-            <p>Best regards,<br/>AHF Auto Parts Team</p>
+            <p>Best regards,<br/>Germania Auto Parts Team</p>
           `,
         });
       } catch {

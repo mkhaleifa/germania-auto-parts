@@ -34,7 +34,7 @@ export const metadata: Metadata = {
       "Premium German-market auto parts, inspected and shipped worldwide.",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: "./car.png",
         width: 1200,
         height: 630,
         alt: "Germania Auto Parts",
