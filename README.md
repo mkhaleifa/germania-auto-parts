@@ -1,36 +1,257 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Germania Auto Parts
 
-## Getting Started
+Premium German Domestic Market (GDM) auto parts platform for Mercedes-Benz, BMW, Porsche, Volkswagen, and Audi.
 
-First, run the development server:
+A production-style full-stack e-commerce application built with Next.js, TypeScript, PostgreSQL, Prisma, Docker, and GitHub Actions.
+
+## 🚗 Overview
+
+Germania Auto Parts is a full-stack e-commerce platform designed for selling premium German automotive parts worldwide.
+
+The application includes a customer storefront, vehicle-based browsing, authentication, shopping cart, wishlist, checkout, user accounts, and an admin dashboard for managing products and orders.
+
+## ✨ Features
+
+* 🛒 Product browsing and shopping cart
+* 🔎 Product search and autocomplete
+* 🚘 Vehicle-based product browsing
+* ❤️ Wishlist functionality
+* 👤 User authentication
+* 🔐 Google and credentials authentication
+* 📦 Order management
+* 💳 Checkout integration
+* 🖼️ Cloud-based product image uploads
+* 👨‍💼 Admin dashboard
+* 📊 Product and order management
+* 📱 Responsive design
+* 🌙 Light/dark theme support
+* 🛡️ API rate limiting
+* 🐳 Dockerized production deployment
+* ⚙️ GitHub Actions CI/CD pipeline
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+* Zustand
+
+### Backend
+
+* Next.js API Routes
+* Prisma ORM
+* PostgreSQL
+* NextAuth
+
+### Infrastructure & DevOps
+
+* Docker
+* Docker Hub
+* GitHub Actions
+* Neon PostgreSQL
+
+### External Services
+
+* Cloudinary
+* Stripe
+* Resend
+* Upstash Redis
+
+## 🏗️ Architecture
+
+```text
+                    ┌─────────────────┐
+                    │     GitHub      │
+                    │   Source Code   │
+                    └────────┬────────┘
+                             │
+                             │ git push
+                             ▼
+                    ┌─────────────────┐
+                    │ GitHub Actions  │
+                    │                 │
+                    │ npm ci          │
+                    │ Prisma Generate │
+                    │ Lint            │
+                    │ Next.js Build   │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ Docker Build    │
+                    │ Production Image│
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │   Docker Hub    │
+                    │ Container Image │
+                    └─────────────────┘
+```
+
+## 🐳 Docker
+
+The application uses a multi-stage Docker build.
+
+The Docker image contains the production-ready Next.js application and runs using the Next.js standalone output.
+
+Build the image locally:
+
+```bash
+docker build -t germania-auto-parts .
+```
+
+Run the production container:
+
+```bash
+docker run --name germania-auto-parts \
+  -p 3000:3000 \
+  --env-file .env \
+  germania-auto-parts
+```
+
+## ⚙️ CI/CD
+
+The project uses GitHub Actions to automate the application build pipeline.
+
+Every push to the `main` branch triggers the workflow:
+
+```text
+Git Push
+   ↓
+GitHub Actions
+   ↓
+Install Dependencies
+   ↓
+Generate Prisma Client
+   ↓
+Run Lint
+   ↓
+Build Next.js Application
+   ↓
+Build Docker Image
+   ↓
+Login to Docker Hub
+   ↓
+Push Docker Image
+```
+
+Docker Hub credentials are stored securely using GitHub Actions Secrets.
+
+This allows the project to automatically validate and package new changes into a production-ready Docker image.
+
+## 🗄️ Database
+
+The application uses PostgreSQL with Prisma ORM.
+
+Main entities include:
+
+* Users
+* Accounts
+* Sessions
+* Addresses
+* Categories
+* Products
+* Vehicles
+* Orders
+* Wishlist
+
+The Prisma Client is generated during both local builds and the CI pipeline.
+
+## 🔐 Environment Variables
+
+Create a `.env` file and configure the required environment variables for:
+
+```text
+DATABASE_URL
+AUTH_SECRET
+AUTH_GOOGLE_ID
+AUTH_GOOGLE_SECRET
+NEXT_PUBLIC_SITE_URL
+CLOUDINARY_*
+STRIPE_*
+RESEND_*
+UPSTASH_*
+```
+
+Do not commit environment files or secret credentials to GitHub.
+
+## 🚀 Running Locally
+
+Clone the repository:
+
+```bash
+git clone https://github.com/mkhaleifa/germania-auto-parts.git
+cd germania-auto-parts
+```
+
+Install dependencies:
+
+```bash
+npm ci
+```
+
+Generate Prisma Client:
+
+```bash
+npx prisma generate
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For a production build:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📦 Docker Image
 
-## Learn More
+The production Docker image is published to Docker Hub:
 
-To learn more about Next.js, take a look at the following resources:
+`mokhalifa12/germania-auto-parts`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The image can be pulled with:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+docker pull mokhalifa12/germania-auto-parts:latest
+```
 
-## Deploy on Vercel
+## 📌 Project Status
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The application is currently running as a production-style Dockerized Next.js application with an automated GitHub Actions pipeline.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The current pipeline builds and publishes the Docker image to Docker Hub.
+
+### Next Infrastructure Step
+
+The next planned step is deploying the Docker image to AWS using services such as Amazon ECR and ECS/Fargate.
+
+## 🎯 What This Project Demonstrates
+
+This project demonstrates practical experience with:
+
+* Full-stack Next.js development
+* TypeScript
+* REST/API development
+* Authentication and authorization
+* Database design with PostgreSQL and Prisma
+* Third-party API integrations
+* Docker containerization
+* Production builds
+* GitHub Actions
+* Continuous Integration
+* Automated Docker image publishing
+* Environment and secret management
+
+## 📄 License
+
+This project is for educational and portfolio purposes.
