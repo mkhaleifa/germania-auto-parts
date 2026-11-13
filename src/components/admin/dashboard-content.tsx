@@ -116,7 +116,9 @@ export function DashboardContent() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Monthly Revenue</p>
-                <p className="mt-1 text-2xl font-bold">{formatPrice(stats.monthRevenue)}</p>
+                <p className="mt-1 text-2xl font-bold">
+                  {formatPrice(stats.monthRevenue)}
+                </p>
               </div>
               <DollarSign className="h-8 w-8 text-muted-foreground/50" />
             </div>
@@ -146,7 +148,9 @@ export function DashboardContent() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Active Products</p>
-                <p className="mt-1 text-2xl font-bold">{stats.activeProducts}</p>
+                <p className="mt-1 text-2xl font-bold">
+                  {stats.activeProducts}
+                </p>
               </div>
               <Package className="h-8 w-8 text-muted-foreground/50" />
             </div>
@@ -184,12 +188,15 @@ export function DashboardContent() {
               {data.revenueByDay.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={data.revenueByDay}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      className="stroke-muted"
+                    />
                     <XAxis
                       dataKey="date"
                       tickFormatter={(v) => {
-                        const d = new Date(v);
-                        return `${d.getMonth() + 1}/${d.getDate()}`;
+                        const d = new Date(v)
+                        return `${d.getMonth() + 1}/${d.getDate()}`
                       }}
                       className="text-xs"
                     />
@@ -198,13 +205,25 @@ export function DashboardContent() {
                       className="text-xs"
                     />
                     <Tooltip
-                      formatter={(value) => [formatPrice(Number(value)), "Revenue"]}
-                      labelFormatter={(label) =>
-                        new Date(label).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
+                      labelFormatter={(label) => {
+                        if (
+                          typeof label !== 'string' &&
+                          typeof label !== 'number'
+                        ) {
+                          return ''
+                        }
+
+                        const date = new Date(label)
+
+                        if (Number.isNaN(date.getTime())) {
+                          return ''
+                        }
+
+                        return date.toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
                         })
-                      }
+                      }}
                     />
                     <Line
                       type="monotone"
@@ -228,7 +247,10 @@ export function DashboardContent() {
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold">Recent Orders</h2>
-              <Link href="/admin/orders" className="text-xs text-primary hover:underline">
+              <Link
+                href="/admin/orders"
+                className="text-xs text-primary hover:underline"
+              >
                 View All
               </Link>
             </div>
@@ -241,14 +263,18 @@ export function DashboardContent() {
                 >
                   <div>
                     <p className="font-mono text-xs">{order.orderNumber}</p>
-                    <p className="text-xs text-muted-foreground">{order.customerName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {order.customerName}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium">{formatPrice(order.total)}</p>
+                    <p className="text-sm font-medium">
+                      {formatPrice(order.total)}
+                    </p>
                     <span
-                      className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${statusColors[order.status] || ""}`}
+                      className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${statusColors[order.status] || ''}`}
                     >
-                      {order.status.replace(/_/g, " ")}
+                      {order.status.replace(/_/g, ' ')}
                     </span>
                   </div>
                 </Link>
@@ -269,7 +295,9 @@ export function DashboardContent() {
               </h2>
             </div>
             {data.lowStockProducts.length === 0 ? (
-              <p className="mt-3 text-sm text-muted-foreground">All products are well stocked.</p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                All products are well stocked.
+              </p>
             ) : (
               <div className="mt-3 space-y-2">
                 {data.lowStockProducts.map((product) => (
@@ -279,10 +307,12 @@ export function DashboardContent() {
                   >
                     <p className="text-sm">{product.title}</p>
                     <Badge
-                      variant={product.stock === 0 ? "destructive" : "outline"}
+                      variant={product.stock === 0 ? 'destructive' : 'outline'}
                       className="text-xs"
                     >
-                      {product.stock === 0 ? "Out of stock" : `${product.stock} left`}
+                      {product.stock === 0
+                        ? 'Out of stock'
+                        : `${product.stock} left`}
                     </Badge>
                   </div>
                 ))}
@@ -300,7 +330,9 @@ export function DashboardContent() {
               </h2>
             </div>
             {data.pendingBankTransfers.length === 0 ? (
-              <p className="mt-3 text-sm text-muted-foreground">No pending bank transfers.</p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                No pending bank transfers.
+              </p>
             ) : (
               <div className="mt-3 space-y-2">
                 {data.pendingBankTransfers.map((order) => (
@@ -311,13 +343,18 @@ export function DashboardContent() {
                   >
                     <div>
                       <p className="font-mono text-xs">{order.orderNumber}</p>
-                      <p className="text-xs text-muted-foreground">{order.customerName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {order.customerName}
+                      </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">{formatPrice(order.total)}</p>
+                      <p className="text-sm font-medium">
+                        {formatPrice(order.total)}
+                      </p>
                       {order.expiresAt && (
                         <p className="text-[10px] text-muted-foreground">
-                          Expires {new Date(order.expiresAt).toLocaleDateString()}
+                          Expires{' '}
+                          {new Date(order.expiresAt).toLocaleDateString()}
                         </p>
                       )}
                     </div>
@@ -329,5 +366,5 @@ export function DashboardContent() {
         </Card>
       </div>
     </div>
-  );
+  )
 }

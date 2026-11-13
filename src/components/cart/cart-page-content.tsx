@@ -1,122 +1,179 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Minus, Plus, ShoppingBag, Trash2, Lock, Truck, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import {
+  Minus,
+  Plus,
+  ShoppingBag,
+  Trash2,
+  Lock,
+  Truck,
+  AlertTriangle,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/seperator";
-import { EmptyState } from "@/components/ui/empty-state";
-import { useCartStore } from "@/stores/cart-store";
-import { formatPrice } from "@/lib/utils";
+} from '@/components/ui/select'
+// NOTE: rename the file to "separator.tsx" and fix this path when you can
+import { Separator } from '@/components/ui/seperator'
+import { EmptyState } from '@/components/ui/empty-state'
+import { useCartStore } from '@/stores/cart-store'
+import { formatPrice } from '@/lib/utils'
 
 const COUNTRIES = [
-  "Japan",
-  "Pakistan",
-  "United States",
-  "United Kingdom",
-  "Australia",
-  "Canada",
-  "Germany",
-  "United Arab Emirates",
-  "Saudi Arabia",
-  "Other",
-];
+  'Germany',
+  'United Kingdom',
+  'United States',
+  'Canada',
+  'Australia',
+  'United Arab Emirates',
+  'Saudi Arabia',
+  'Japan',
+  'Pakistan',
+  'Other',
+]
 
-interface ValidationWarning {
-  productId: string;
-  message: string;
+const DEFAULT_COUNTRY = 'Germany'
+
+interface CartWarning {
+  productId: string
+  message: string
+  /** blocking warnings disable the checkout button */
+  blocking: boolean
 }
 
 export function CartPageContent() {
-  const { items, removeItem, updateQuantity, getTotal, getItemCount, clearCart } =
-    useCartStore();
-  const [shippingCountry, setShippingCountry] = useState("Japan");
-  const [shippingCost, setShippingCost] = useState(0);
-  const [freeShipping, setFreeShipping] = useState(false);
-  const [tax, setTax] = useState(0);
-  const [warnings, setWarnings] = useState<ValidationWarning[]>([]);
-  const [validating, setValidating] = useState(false);
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    getTotal,
+    getItemCount,
+    clearCart,
+  } = useCartStore()
+  const [shippingCountry, setShippingCountry] = useState(DEFAULT_COUNTRY)
+  const [shippingCost, setShippingCost] = useState(0)
+  const [freeShipping, setFreeShipping] = useState(false)
+  const [shippingError, setShippingError] = useState(false)
+  const [tax, setTax] = useState(0)
+  const [warnings, setWarnings] = useState<CartWarning[]>([])
+  const [validating, setValidating] = useState(false)
 
-  const subtotal = getTotal();
-  const itemCount = getItemCount();
-  const total = subtotal + shippingCost + tax;
+  const subtotal = getTotal()
+  const itemCount = getItemCount()
+  const total = subtotal + shippingCost + tax
+  const checkoutBlocked = warnings.some((w) => w.blocking)
 
-  // Validate cart on mount
+  // Validate cart whenever it changes (debounced, cancels stale requests)
   useEffect(() => {
-    if (items.length === 0) return;
+    if (items.length === 0) {
+      setWarnings([])
+      setValidating(false)
+      return
+    }
 
-    async function validateCart() {
-      setValidating(true);
+    const controller = new AbortController()
+
+    const timer = setTimeout(async () => {
+      setValidating(true)
       try {
-        const res = await fetch("/api/cart/validate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const res = await fetch('/api/cart/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
           body: JSON.stringify({
             items: items.map((i) => ({
               productId: i.productId,
               quantity: i.quantity,
             })),
           }),
-        });
-        const data = await res.json();
-        if (!data.valid && data.items) {
-          const newWarnings: ValidationWarning[] = [];
-          for (const item of data.items) {
-            if (!item.available) {
-              newWarnings.push({
-                productId: item.productId,
-                message: "This item is no longer available",
-              });
-            } else if (item.stockInsufficient) {
-              newWarnings.push({
-                productId: item.productId,
-                message: `Only ${item.currentStock} left in stock`,
-              });
-            }
-          }
-          setWarnings(newWarnings);
-        }
-      } catch {
-        // Silently fail validation
-      } finally {
-        setValidating(false);
-      }
-    }
+        })
+        if (!res.ok) return
+        const data = await res.json()
 
-    validateCart();
-  }, [items]);
+        // Always rebuild warnings so old ones disappear once fixed
+        const next: CartWarning[] = []
+        for (const v of data.items ?? []) {
+          const stored = items.find((i) => i.productId === v.productId)
+          const name = stored?.title ?? 'Item'
+
+          if (!v.available) {
+            next.push({
+              productId: v.productId,
+              message: `${name} is no longer available`,
+              blocking: true,
+            })
+          } else if (v.stockInsufficient) {
+            next.push({
+              productId: v.productId,
+              message: `${name}: only ${v.currentStock} left in stock`,
+              blocking: true,
+            })
+          } else if (
+            stored &&
+            Math.abs(stored.price - v.currentPrice) > 0.001
+          ) {
+            next.push({
+              productId: v.productId,
+              message: `${name}: price updated to ${formatPrice(v.currentPrice)}`,
+              blocking: false,
+            })
+          }
+        }
+        if (!controller.signal.aborted) setWarnings(next)
+      } catch {
+        // Aborted or network error: keep the current warnings
+      } finally {
+        if (!controller.signal.aborted) setValidating(false)
+      }
+    }, 300)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [items])
 
   // Estimate shipping when country or subtotal changes
   useEffect(() => {
+    if (items.length === 0) return
+
+    const controller = new AbortController()
+
     async function estimateShipping() {
       try {
+        // TODO: calculate weight from the cart items if your schema has it
         const res = await fetch(
-          `/api/shipping/estimate?country=${encodeURIComponent(shippingCountry)}&subtotal=${subtotal}&weight=2`
-        );
-        const data = await res.json();
+          `/api/shipping/estimate?country=${encodeURIComponent(shippingCountry)}&subtotal=${subtotal}&weight=2`,
+          { signal: controller.signal },
+        )
+        if (!res.ok) throw new Error('Shipping estimate failed')
+        const data = await res.json()
         if (data.data) {
-          setShippingCost(data.data.shippingCost);
-          setFreeShipping(data.data.freeShipping);
-          setTax(data.data.tax);
+          setShippingCost(data.data.shippingCost)
+          setFreeShipping(data.data.freeShipping)
+          setTax(data.data.tax)
+          setShippingError(false)
         }
-      } catch {
-        // Use default
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') return
+        setShippingError(true)
+        setShippingCost(0)
+        setFreeShipping(false)
+        setTax(0)
       }
     }
 
-    if (items.length > 0) {
-      estimateShipping();
-    }
-  }, [shippingCountry, subtotal, items.length]);
+    estimateShipping()
+    return () => controller.abort()
+  }, [shippingCountry, subtotal, items.length])
 
   if (items.length === 0) {
     return (
@@ -127,13 +184,13 @@ export function CartPageContent() {
         actionLabel="Start Shopping"
         actionHref="/products"
       />
-    );
+    )
   }
 
   return (
     <div>
       <h1 className="text-2xl font-bold md:text-3xl">
-        Shopping Cart ({itemCount} {itemCount === 1 ? "item" : "items"})
+        Shopping Cart ({itemCount} {itemCount === 1 ? 'item' : 'items'})
       </h1>
 
       {/* Validation warnings */}
@@ -144,7 +201,7 @@ export function CartPageContent() {
             <p className="font-medium">Some items in your cart have changed</p>
             <ul className="mt-1 list-inside list-disc">
               {warnings.map((w) => (
-                <li key={w.productId}>{w.message}</li>
+                <li key={`${w.productId}-${w.message}`}>{w.message}</li>
               ))}
             </ul>
           </div>
@@ -186,7 +243,9 @@ export function CartPageContent() {
                     {item.title}
                   </Link>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    {item.condition === "NEW" ? "New" : `Used — ${item.condition.replace("_", " ")}`}
+                    {item.condition === 'NEW'
+                      ? 'New'
+                      : `Used — ${item.condition.replaceAll('_', ' ')}`}
                   </p>
                   <p className="mt-1 text-sm font-bold text-primary">
                     {formatPrice(item.price)}
@@ -199,6 +258,7 @@ export function CartPageContent() {
                         variant="outline"
                         size="icon"
                         className="h-8 w-8"
+                        aria-label={`Decrease quantity of ${item.title}`}
                         onClick={() =>
                           updateQuantity(item.productId, item.quantity - 1)
                         }
@@ -212,6 +272,7 @@ export function CartPageContent() {
                         variant="outline"
                         size="icon"
                         className="h-8 w-8"
+                        aria-label={`Increase quantity of ${item.title}`}
                         disabled={item.quantity >= item.maxStock}
                         onClick={() =>
                           updateQuantity(item.productId, item.quantity + 1)
@@ -230,6 +291,7 @@ export function CartPageContent() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        aria-label={`Remove ${item.title}`}
                         onClick={() => removeItem(item.productId)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -242,7 +304,7 @@ export function CartPageContent() {
           ))}
 
           <div className="flex items-center justify-between pt-2">
-            <Button variant="outline" render={<Link href="/products" />}>
+            <Button variant="outline" render={<Link href="/products" />} nativeButton={false}>
               Continue Shopping
             </Button>
             <Button
@@ -267,7 +329,7 @@ export function CartPageContent() {
                 <Select
                   value={shippingCountry}
                   onValueChange={(val: string | null) =>
-                    setShippingCountry(val || "Japan")
+                    setShippingCountry(val || DEFAULT_COUNTRY)
                   }
                 >
                   <SelectTrigger className="mt-1">
@@ -294,7 +356,11 @@ export function CartPageContent() {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Shipping</span>
                   <span className="font-medium">
-                    {freeShipping ? (
+                    {shippingError ? (
+                      <span className="text-muted-foreground">
+                        Calculated at checkout
+                      </span>
+                    ) : freeShipping ? (
                       <span className="text-green-600">FREE</span>
                     ) : (
                       formatPrice(shippingCost)
@@ -303,7 +369,7 @@ export function CartPageContent() {
                 </div>
                 {tax > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Tax (10%)</span>
+                    <span className="text-muted-foreground">Tax</span>
                     <span className="font-medium">{formatPrice(tax)}</span>
                   </div>
                 )}
@@ -314,20 +380,28 @@ export function CartPageContent() {
                 </div>
               </div>
 
-              {freeShipping && (
+              {freeShipping && !shippingError && (
                 <div className="mt-3 flex items-center gap-2 text-xs text-green-600">
                   <Truck className="h-3.5 w-3.5" />
                   Your order qualifies for free shipping!
                 </div>
               )}
 
-              <Button
-                className="mt-6 w-full"
-                size="lg"
-                render={<Link href="/checkout" />}
-              >
-                Proceed to Checkout
-              </Button>
+              {checkoutBlocked ? (
+                <Button className="mt-6 w-full" size="lg" disabled>
+                  Fix cart issues to continue
+                </Button>
+              ) : (
+                <Button
+                  className="mt-6 w-full"
+                  size="lg"
+                  disabled={validating}
+                  nativeButton={false}
+                  render={<Link href="/checkout" />}
+                >
+                  Proceed to Checkout
+                </Button>
+              )}
 
               <div className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 <Lock className="h-3 w-3" />
@@ -338,5 +412,5 @@ export function CartPageContent() {
         </div>
       </div>
     </div>
-  );
+  )
 }

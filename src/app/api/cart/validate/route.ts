@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
           currentStock: 0,
           available: false,
           priceChanged: false,
-          stockInsufficient: true,
+          stockInsufficient: false,
         };
       }
 
